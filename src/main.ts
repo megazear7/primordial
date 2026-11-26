@@ -3,6 +3,7 @@ import './style.css';
 import { classifyLayout, defaultZoom, orientationFor, readLayoutHints } from './layout';
 import type { LayoutMode } from './layout';
 import { Camera } from './render/camera';
+import { createGuide } from './render/guide';
 import { mountHud } from './render/hud';
 import { attachInput } from './render/input';
 import { chooseResolution, currentDeviceProfile, loadQuality, QUALITY_PRESETS, saveQuality } from './render/quality';
@@ -52,13 +53,14 @@ async function boot(root: HTMLElement): Promise<void> {
   app.canvas.tabIndex = 0;
   app.canvas.setAttribute(
     'aria-label',
-    'Primordial microscope. Drag or use arrow keys to pan. Pinch, scroll, or plus and minus to zoom. Enter opens quality. Escape returns to the slide.',
+    'Primordial microscope. Drag or use arrow keys to pan. Pinch, scroll, or plus and minus to zoom. Enter opens the menu. Escape returns to the slide.',
   );
   app.stage.eventMode = 'none';
   root.appendChild(app.canvas);
 
   const water = new WaterFilter();
-  const scene = new Scene(createTextures(), water, state.config.worldWidth, state.config.worldHeight);
+  const textures = createTextures();
+  const scene = new Scene(textures, water, state.config.worldWidth, state.config.worldHeight);
   scene.resizeBackground(state.config.worldWidth, state.config.worldHeight);
   scene.setQuality(QUALITY_PRESETS[quality]);
   water.applyPreset(QUALITY_PRESETS[quality], reducedMotion);
@@ -73,16 +75,19 @@ async function boot(root: HTMLElement): Promise<void> {
     cameraTouched = true;
   });
   hud.setQuality(quality);
+  const drawGuide = createGuide(app, textures, hud.element);
 
   const input = attachInput({
     canvas: app.canvas,
     camera,
     getScreen: screenOf,
     getLayout: () => layout,
-    isQualityFocused: () => hud.isQualityFocused(),
+    isMenuFocused: () => hud.isMenuFocused(),
     isMinimapFocused: () => hud.isMinimapFocused(),
-    onQualityArrow: (dx, dy) => hud.moveQuality(dx, dy),
-    onFocusQuality: () => hud.focusQuality(),
+    onMenuArrow: (dx, dy) => hud.moveMenu(dx, dy),
+    onOpenMenu: () => hud.openMenu(),
+    onFocusMenu: () => hud.focusMenu(),
+    onCloseMenu: () => hud.closeMenu(),
     onFocusSlide: () => hud.focusSlide(app.canvas),
     onUser: () => {
       cameraTouched = true;
@@ -137,6 +142,7 @@ async function boot(root: HTMLElement): Promise<void> {
     scene.sync(state, camera, now / 1000, screen, layout);
     hud.update(state, fps, layout);
     hud.drawMap(state, camera, screen);
+    if (hud.isGuideOpen()) drawGuide((now / 1000) * motion);
   });
 
   window.addEventListener('pagehide', () => input.destroy());
