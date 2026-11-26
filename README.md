@@ -44,7 +44,22 @@ The site is meant to be served at `https://megazear7.github.io/primordial/`.
 2. Set **Source** to **GitHub Actions**.
 3. Merge this project to `main`.
 
-`.github/workflows/pages.yml` builds with `BASE_PATH=/primordial/` and deploys the `dist` folder with `actions/deploy-pages`. There is no `CNAME` yet; a custom domain can be added later without changing asset paths. Vite's `base` keeps script, style, and icon URLs on that subpath. Local `npm run dev` uses `/`.
+`.github/workflows/pages.yml` builds with `BASE_PATH=/primordial/` and deploys the `dist` folder with `actions/deploy-pages`. There is no `CNAME` yet. Vite's `base` keeps script, style, icon, manifest, and service worker URLs on that subpath.
+
+## Install and offline
+
+The production build is a progressive web app. It precaches the page, scripts, styles, and icons, so the slide opens with no network after one online visit. A newer deploy waits until you choose **Update**, then the new service worker takes over and reloads once onto the fresh cache.
+
+Manifest scope, start URL, and the service worker follow Vite's `base`:
+
+- GitHub Pages sets `BASE_PATH=/primordial/`.
+- `primordial.alexlockhart.me` should be built with `BASE_PATH=/` or with the variable unset. The app does not hardcode `/primordial/`.
+
+Install it from the browser (Chrome and Edge show an install icon; on iPhone use Share → Add to Home Screen). Icons include 192 and 512 any-purpose, maskable copies of both, and a 180px Apple touch icon. Display is standalone and orientation is any, so landscape and portrait both work.
+
+`npm run dev` does not register a service worker. Use `npm run build` and `npm run preview` to try the offline app. For the Pages path, build and preview with `BASE_PATH=/primordial/`.
+
+iOS does not offer an install prompt, ignores maskable icons, and can evict the cache after a long time unused. A new version is picked up the next time the home-screen app is opened, not while it sits in the background.
 
 ## Layout
 

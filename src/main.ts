@@ -10,6 +10,7 @@ import type { QualityName } from './render/quality';
 import { Scene } from './render/scene';
 import { createTextures } from './render/textures';
 import { WaterFilter } from './render/water';
+import { listenForAppUpdate } from './pwa';
 import { createWorld, stepWorld } from './sim/world';
 
 const state = createWorld();
@@ -22,6 +23,7 @@ let cameraTouched = false;
 const appRoot = document.querySelector<HTMLElement>('#app');
 if (!appRoot) throw new Error('Missing #app');
 
+listenForAppUpdate();
 void boot(appRoot);
 
 async function boot(root: HTMLElement): Promise<void> {

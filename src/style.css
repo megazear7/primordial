@@ -241,3 +241,54 @@ html[data-layout="tv"] #app canvas:focus-visible {
   .title-card { padding: 6px 10px; }
   h1 { letter-spacing: 0.12em; }
 }
+
+.update-banner {
+  position: fixed;
+  z-index: 5;
+  left: max(var(--pad), env(safe-area-inset-left));
+  bottom: max(var(--pad), env(safe-area-inset-bottom));
+  max-width: min(28rem, calc(100vw - var(--minimap-w) - 48px));
+  padding: 12px 14px;
+  color: var(--ink);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  pointer-events: auto;
+}
+
+.update-banner p {
+  margin: 0;
+  font-size: var(--body);
+  line-height: 1.35;
+}
+
+.update-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.update-banner button {
+  appearance: none;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--body);
+  min-height: 44px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.update-banner .update-now {
+  background: rgba(150, 240, 220, 0.18);
+  box-shadow: inset 0 0 0 2px rgba(186, 255, 232, 0.9);
+}
+
+html[data-layout="tv"] .update-banner button {
+  min-height: 72px;
+  padding: 12px 28px;
+}
