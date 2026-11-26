@@ -235,7 +235,7 @@ export class Scene {
       if (!visible) continue;
       const rotten = nutrient.phase === 'rotten';
       const t = nutrient.food / maxFood;
-      sprite.tint = rotten ? 0x6e7846 : t < 0.55 ? lerpColor(0xa9c96c, 0xe7c15a, t / 0.55) : lerpColor(0xe7c15a, 0xff5c38, (t - 0.55) / 0.45);
+      sprite.tint = nutrientTint(nutrient.phase);
       const pulse = 1 + Math.sin(time * 2.4 + nutrient.phaseSeed) * 0.06;
       const size = (rotten ? 16 : 18 + t * 16) * pulse;
       sprite.alpha = rotten ? 0.38 : 0.9;
@@ -439,6 +439,10 @@ export class Scene {
       map.delete(id);
     }
   }
+}
+
+export function nutrientTint(phase: 'ripe' | 'rotten'): number {
+  return phase === 'ripe' ? 0xff493c : 0x88503a;
 }
 
 function inView(x: number, y: number, camera: Camera, screen: ScreenSize, margin: number): boolean {

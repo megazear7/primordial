@@ -2,7 +2,7 @@
 
 A hands-off microbial colony simulation. Glowing colonies send flagellates out through a much larger watery world to gather drifting nutrients, bring them home, and grow. You watch, pan, and zoom. The rules are the old [village](https://github.com/megazear7/canvas-play) simulation (homes, gatherers, ripening apples, outposts, splits) recast as a microscope slide.
 
-This is stage 1: the running world, not the menu or save slots.
+This is stage 1: the running world and field guide, without save slots.
 
 ## Run locally
 
@@ -30,11 +30,13 @@ The same build serves phones, tablets, desktops, and televisions.
 | Arrow keys or WASD | Pan (hold to accelerate) |
 | `+` / `−`, numpad, Page Up / Page Down, channel or media skip keys | Zoom toward the center |
 | Home | Recenter the slide |
-| Enter | Move focus to quality |
-| Escape or Back | Return focus to the slide |
+| Enter on the slide | Open the menu |
+| Arrow keys in the menu | Navigate controls; scroll the field guide |
+| Escape or Back | Return to the menu or slide |
 | Minimap drag or click | Jump the view |
 
 Quality is Low, Medium, or High. The first visit picks a default from screen size, pixel ratio, memory, and CPU count, and remembers a manual choice in `localStorage`. A 4K television starts on Medium so the post-process is not a full 8-megapixel shader unless you ask for High.
+The corner menu also contains live statistics and a field guide. The minimap shows colonies, their membrane territories and vacuoles, and the current viewport, but not individual gatherers or nutrients.
 
 ## GitHub Pages
 

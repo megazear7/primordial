@@ -11,10 +11,12 @@ export interface InputOptions {
   camera: Camera;
   getScreen: () => ScreenSize;
   getLayout: () => LayoutMode;
-  isQualityFocused: () => boolean;
+  isMenuFocused: () => boolean;
   isMinimapFocused: () => boolean;
-  onQualityArrow: (dx: number, dy: number) => void;
-  onFocusQuality: () => void;
+  onMenuArrow: (dx: number, dy: number) => boolean;
+  onOpenMenu: () => void;
+  onFocusMenu: () => void;
+  onCloseMenu: () => void;
   onFocusSlide: () => void;
   onUser: () => void;
 }
@@ -75,7 +77,7 @@ export function attachInput(options: InputOptions): InputController {
   };
 
   const onWheel = (event: WheelEvent) => {
-    if (event.target instanceof HTMLButtonElement) return;
+    if (event.target !== canvas) return;
     event.preventDefault();
     const point = local(event.clientX, event.clientY);
     const delta = Math.abs(event.deltaMode === 1 ? event.deltaY * 16 : event.deltaY);
@@ -88,7 +90,17 @@ export function attachInput(options: InputOptions): InputController {
     if (isEditable(event.target)) return;
     const zoom = zoomDirection(event);
     const arrow = arrowDirection(event);
-    const quality = options.isQualityFocused();
+    const menu = options.isMenuFocused();
+    if (menu) {
+      held.clear();
+      if (isBackKey(event)) {
+        event.preventDefault();
+        options.onCloseMenu();
+      } else if (arrow && options.onMenuArrow(arrow.x, arrow.y)) {
+        event.preventDefault();
+      }
+      return;
+    }
     if (event.code === 'Home') {
       event.preventDefault();
       camera.x = camera.worldWidth / 2;
@@ -100,27 +112,22 @@ export function attachInput(options: InputOptions): InputController {
     if (event.key === 'Enter') {
       if (document.activeElement === canvas) {
         event.preventDefault();
-        options.onFocusQuality();
+        options.onOpenMenu();
       } else if (options.isMinimapFocused()) {
         event.preventDefault();
         options.onFocusSlide();
       }
       return;
     }
-    if (isBackKey(event) && (quality || options.isMinimapFocused())) {
+    if (isBackKey(event) && options.isMinimapFocused()) {
       event.preventDefault();
       options.onFocusSlide();
       return;
     }
     if (isBackKey(event)) event.preventDefault();
-    if (arrow && quality) {
-      event.preventDefault();
-      options.onQualityArrow(arrow.x, arrow.y);
-      return;
-    }
     if (arrow && options.isMinimapFocused() && arrow.y < 0 && arrow.x === 0) {
       event.preventDefault();
-      options.onFocusQuality();
+      options.onFocusMenu();
       return;
     }
     if (zoom || arrow) {
@@ -148,7 +155,8 @@ export function attachInput(options: InputOptions): InputController {
 
   return {
     update(dt: number) {
-      if (options.isQualityFocused()) {
+      if (options.isMenuFocused()) {
+        held.clear();
         heldFor = 0;
         return;
       }
